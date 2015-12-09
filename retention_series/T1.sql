@@ -1,5 +1,5 @@
 /*
-Developed by: Maayan ROman
+Developed by: Maayan Roman
 Developed on: 12/8/2015
 
 Criteria:
