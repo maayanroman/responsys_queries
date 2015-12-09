@@ -52,3 +52,9 @@ inner join (
   where $C$.status = 'completed'
   and $C$.type = 'take_payment'
   ) lt on lt.loan_id = l.ac_id and lt.row_num = 1
+inner join (
+ select $D$.customer_id, $D$.approved, Row_number () over (
+  partition by $D$.customer_id
+  order by $D$.created_at desc)
+ from $D$) cd on cd.customer_id = l.customer_id and cd.row_num = 1
+ where cd.approved = 'true'
