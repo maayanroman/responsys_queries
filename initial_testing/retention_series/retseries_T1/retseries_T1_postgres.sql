@@ -36,5 +36,5 @@ where cd.approved is true
 and not exists (
   select 1
   from loans
-  where status in ('current','applied','approved','late','charged_off')
+  where status in ('current','applied','approved','late')
   and customer_id = c.id)
