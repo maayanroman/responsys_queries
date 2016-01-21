@@ -30,6 +30,7 @@ left join credit_decisions cd on cd.id = (
   from credit_decisions
   where customer_id = c.id
   order by created_at desc limit 1)
+ /* arbitrary change note */
 where cd.approved is true
 /* exclude any customers with active products or active loan applications */
 and not exists (
