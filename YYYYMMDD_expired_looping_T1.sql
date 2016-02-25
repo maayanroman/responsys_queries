@@ -59,20 +59,10 @@ FROM   (SELECT a.customer_id,
         WHERE  a.row_id = 1 
                AND a.status = 'cancelled' 
                AND Cast(a.apr_percentage AS DECIMAL(9, 4)) < 0.40 
-               AND ( Mod(( ( Trunc(CURRENT_DATE) - Trunc( 
-                             From_tz(Cast(a.status_date AS 
-                                          TIMESTAMP), 
-                                   'utc') 
-                             ) 
-                           ) - 160 ), 140) >= 1 
-                     AND Mod(( ( Trunc(CURRENT_DATE) - Trunc( 
-                                 From_tz(Cast(a.status_date 
-                                              AS 
-                                              TIMESTAMP), 
-                                     'utc') 
-                                                           ) 
-                               ) - 160 ), 140) < 14 ) 
-       /*If remainder of ((# of days since their app expired - 160) / 140) falls between [1,14), email sent.*/)b
+               AND ( Mod( ( ( Trunc(CURRENT_DATE) - Trunc( From_tz(Cast(a.status_date AS TIMESTAMP), 'utc') ) ) - 160 ), 140) >= 1 
+                     AND Mod( ( ( Trunc(CURRENT_DATE) - Trunc( From_tz(Cast(a.status_date AS TIMESTAMP), 'utc') ) ) - 160 ), 140) < 14 ) 
+       /*If remainder of ((# of days since their app expired - 160) / 140) falls between [1,14), email sent.*/
+       )b
        JOIN $a$ c 
          ON b.customer_id = c.ac_id 
 WHERE  b.cd_approved_flg = 'true' 
