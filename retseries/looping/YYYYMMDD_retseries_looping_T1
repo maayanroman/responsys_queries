@@ -40,6 +40,7 @@ FROM   $a$
                  AND Z.approved = 'false' 
                  AND To_char(Cast(( From_tz(Cast(Z.created_at AS TIMESTAMP), '+00:00') at time zone 'US/Central' ) AS DATE), 'yyyy-mm-dd') >= To_char(( sysdate - 30 ), 'yyyy-mm-dd') 
                  AND To_char(Cast(( From_tz(Cast(Z.created_at AS TIMESTAMP), '+00:00') at time zone 'US/Central' ) AS DATE), 'yyyy-mm-dd') > To_char(( X.eff_date + 5 ), 'yyyy-mm-dd') 
-WHERE  To_char(X.eff_date, 'yyyy-mm-dd') = To_char(( sysdate - 7 ), 'yyyy-mm-dd') 
+WHERE  Trunc(X.eff_date) <= Trunc(Current_Date) - 286
+       AND (Mod(( Trunc(CURRENT_DATE) - Trunc(X.eff_date) ) - 286, 140) >= 1 AND Mod(( Trunc(CURRENT_DATE) - Trunc(X.eff_date) ) - 286, 140) < 14 ) 
        AND Y.ac_id IS NULL 
        AND Z.ac_id IS NULL 
