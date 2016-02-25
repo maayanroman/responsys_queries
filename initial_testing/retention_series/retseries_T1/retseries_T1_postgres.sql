@@ -4,6 +4,7 @@ Criteria:
  - Customers whose most recently paid off loan was paid off 5 days ago
  - Exclude customers with active products
  - Exclude customers who were already declined
+ - Jodi testing
 */
 
 select c.email
