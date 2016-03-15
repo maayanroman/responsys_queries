@@ -25,6 +25,7 @@ WHERE  0 = 0
                        FROM   $d$ 
                        WHERE  $d$.customer_id = le.customer_id) 
        AND ( cd.approved = 'true' OR cd.approved IS NULL ) 
+       AND Trunc(From_tz(Cast(le.created_at AS TIMESTAMP), 'utc')) <= Trunc(CURRENT_DATE) - 140 
        AND ( Mod(( ( Trunc(CURRENT_DATE) - Trunc(From_tz(Cast(le.created_at AS TIMESTAMP), 'utc') ) ) - 140 ), 140) >= 1 
        AND Mod(( ( Trunc(CURRENT_DATE) - Trunc(From_tz(Cast(le.created_at AS TIMESTAMP), 'utc') ) ) - 140 ), 140) < 14 ) 
        
