@@ -1,0 +1,59 @@
+/* Data/customers 	 $A$ 
+ Data/loans 	 $B$ 
+ Data/credit_decisions 	 $C$ 
+ Data/loan_tasks 	 $D$ */
+
+SELECT DISTINCT $a$.riid_, 
+                $a$.email_address_ 
+FROM   $a$ 
+       INNER JOIN (SELECT $b$.ac_id, 
+                          $b$.created_at, 
+                          $b$.customer_id, 
+                          $b$.status, 
+                          Row_number () 
+                            OVER ( 
+                              partition BY $b$.customer_id 
+                              ORDER BY $b$.created_at DESC) ROW_NUM 
+                   FROM   $b$ 
+                   WHERE  $b$.status = 'paid_off') W 
+               ON W.customer_id = $a$.ac_id 
+                  AND W.row_num = 1 
+       LEFT JOIN (SELECT $d$.ac_id, 
+                         $d$.eff_date, 
+                         $d$.loan_id, 
+                         $d$.ac_type, 
+                         $d$.status, 
+                         Row_number () 
+                           OVER ( 
+                             partition BY $d$.loan_id 
+                             ORDER BY $d$.eff_date DESC) row_num 
+                  FROM   $d$ 
+                  WHERE  $d$.ac_type = 'take_payment' 
+                         AND $d$.status = 'completed')X 
+              ON X.loan_id = W.ac_id 
+                 AND X.row_num = 1 
+       LEFT JOIN $b$ Y 
+              ON $a$.ac_id = Y.customer_id 
+                 AND Y.status IN ( 'current', 'late', 'applied', 'approved' ) 
+       LEFT JOIN $c$ Z 
+              ON Z.customer_id = $a$.ac_id 
+                 AND Z.approved = 'false' 
+                 AND To_char(Cast(( From_tz(Cast(Z.created_at AS TIMESTAMP), 
+                                    '+00:00') 
+                                    at time 
+                                    zone 
+                                                'US/Central' ) 
+                                              AS DATE), 'yyyy-mm-dd') >= 
+                     To_char(( sysdate - 30 ), 'yyyy-mm-dd') 
+                 AND To_char(Cast(( From_tz(Cast(Z.created_at AS TIMESTAMP), 
+                                    '+00:00') 
+                                    at time zone 
+                                                'US/Central' ) 
+                                              AS DATE), 'yyyy-mm-dd') > To_char( 
+                     ( X.eff_date + 5 ), 'yyyy-mm-dd') 
+WHERE  Trunc(X.eff_date) <= Trunc(CURRENT_DATE) - 280 
+       AND ( Mod(( Trunc(CURRENT_DATE) - Trunc(X.eff_date) ) - 280, 140) >= 29 
+             AND Mod(( Trunc(CURRENT_DATE) - Trunc(X.eff_date) ) - 280, 140) < 
+                 42 ) 
+       AND Y.ac_id IS NULL 
+       AND Z.ac_id IS NULL 
