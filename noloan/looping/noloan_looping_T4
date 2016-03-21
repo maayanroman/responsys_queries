@@ -1,0 +1,42 @@
+/* Data/customers 	 $A$ 
+ Data/leads 	 $B$ 
+ Data/credit_decisions 	 $C$ 
+ Data/loans 	 $D$ */
+ 
+ SELECT DISTINCT c.email_address_, 
+                c.riid_ 
+FROM   $b$ le 
+       INNER JOIN $a$ c 
+               ON c.ac_id = le.customer_id 
+       LEFT JOIN (SELECT $c$.customer_id, 
+                         $c$.created_at, 
+                         $c$.approved, 
+                         Row_number() 
+                           OVER ( 
+                             partition BY $c$.customer_id 
+                             ORDER BY $c$.created_at DESC) row_num 
+                  FROM   $c$) cd 
+              ON cd.customer_id = le.customer_id 
+                 AND cd.row_num = 1 
+WHERE  0 = 0 
+       AND le.ac_source = 'lending_tree' 
+       AND le.decision = 'import' 
+       AND NOT EXISTS (SELECT $d$.ac_id 
+                       FROM   $d$ 
+                       WHERE  $d$.customer_id = le.customer_id) 
+       AND ( cd.approved = 'true' 
+              OR cd.approved IS NULL ) 
+       AND Trunc(From_tz(Cast(le.created_at AS TIMESTAMP), 'utc')) <= 
+           Trunc(CURRENT_DATE) - 140 
+       AND ( Mod(( ( Trunc(CURRENT_DATE) - Trunc(From_tz(Cast(le.created_at AS 
+                                                              TIMESTAMP), 
+                                                       'utc') 
+                                                 ) 
+                   ) - 140 ), 140) >= 43 
+             AND Mod(( ( Trunc(CURRENT_DATE) - Trunc(From_tz(Cast(le.created_at 
+                                                                  AS 
+                                                                  TIMESTAMP), 
+                                                         'utc') 
+                                                   ) 
+                       ) - 140 ), 140) < 56 ) 
+       AND c.riid_ IS NOT NULL 
