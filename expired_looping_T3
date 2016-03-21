@@ -1,3 +1,11 @@
+/*
+ Table 	 Symbolic Name 
+ Data/customers 	 $A$ 
+ Data/loan_status_logs 	 $B$ 
+ Data/loans 	 $C$ 
+ Data/credit_decisions 	 $D$ 
+*/
+
 SELECT DISTINCT c.riid_, 
                 c.email_address_ 
 FROM   (SELECT a.customer_id, 
