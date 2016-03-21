@@ -24,7 +24,9 @@ WHERE  0 = 0
        AND NOT EXISTS (SELECT $d$.ac_id 
                        FROM   $d$ 
                        WHERE  $d$.customer_id = le.customer_id) 
-       AND ( cd.approved = 'true' 
-              OR cd.approved IS NULL ) 
-       AND To_char(Cast(( From_tz(Cast(le.created_at AS TIMESTAMP), '+00:00') at time zone 'US/Central' ) AS DATE), 'yyyy-mm-dd') = To_char(( sysdate - 2 ), 'yyyy-mm-dd') 
+       AND ( cd.approved = 'true' OR cd.approved IS NULL ) 
+       AND Trunc(From_tz(Cast(le.created_at AS TIMESTAMP), 'utc')) <= Trunc(CURRENT_DATE) - 140 
+       AND ( Mod(( ( Trunc(CURRENT_DATE) - Trunc(From_tz(Cast(le.created_at AS TIMESTAMP), 'utc') ) ) - 140 ), 140) >= 1 
+       AND Mod(( ( Trunc(CURRENT_DATE) - Trunc(From_tz(Cast(le.created_at AS TIMESTAMP), 'utc') ) ) - 140 ), 140) < 14 ) 
+       
        AND c.riid_ IS NOT NULL 
